@@ -9,7 +9,10 @@ setlocal EnableDelayedExpansion
 ::        "접두사_001" 형식으로 일괄 변경
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-for /f "delims=" %%a in ('echo prompt $E^| cmd') do set "ESC=%%a"
+:: ESC 문자 설정 (PowerShell 사용, 가장 호환성 높은 방식)
+for /f "delims=" %%a in ('powershell -NoProfile -Command "[char]0x1B"') do set "ESC=%%a"
+if not defined ESC set "ESC="
+
 set "RED=%ESC%[31m"
 set "GREEN=%ESC%[32m"
 set "YELLOW=%ESC%[33m"
@@ -19,20 +22,28 @@ set "NC=%ESC%[0m"
 
 set "SCRIPT_DIR=%~dp0"
 set "SCRIPT_NAME=%~nx0"
-for /f %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set "TIMESTAMP=%%t"
+for /f "delims=" %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set "TIMESTAMP=%%t"
+if not defined TIMESTAMP set "TIMESTAMP=00000000_000000"
+
 set "BACKUP_DIR=%SCRIPT_DIR%_sort_backup"
 set "RESTORE_FILE=%BACKUP_DIR%\restore_%TIMESTAMP%.bat"
 set "TMP_PREFIX=__sbn_%TIMESTAMP%_"
 
 call :main
-exit /b %errorlevel%
+set "EXIT_CODE=%errorlevel%"
+exit /b %EXIT_CODE%
 
 :: ==============================================================================
 :main
     call :print_banner
     call :get_prefix
+    if errorlevel 1 (
+        echo.
+        pause
+        exit /b 1
+    )
     call :collect_files
-    if %FILE_COUNT% equ 0 (
+    if "!FILE_COUNT!"=="0" (
         echo.
         echo   %YELLOW%정리할 파일이 없습니다.%NC%
         echo.
@@ -88,21 +99,21 @@ exit /b %errorlevel%
         )
     )
     set "PAD_WIDTH=3"
-    if %FILE_COUNT% gtr 999 set "PAD_WIDTH=4"
-    if %FILE_COUNT% gtr 9999 set "PAD_WIDTH=5"
+    if !FILE_COUNT! gtr 999  set "PAD_WIDTH=4"
+    if !FILE_COUNT! gtr 9999 set "PAD_WIDTH=5"
     exit /b 0
 
 :: ==============================================================================
 :print_preview
     echo %BOLD%  [미리보기] 다음과 같이 파일이 변경됩니다:%NC%
     echo.
-    for /l %%i in (1,1,%FILE_COUNT%) do (
+    for /l %%i in (1,1,!FILE_COUNT!) do (
         set "ZEROS=000000000%%i"
         set "PADDED=!ZEROS:~-%PAD_WIDTH%!"
         echo     !FILE_%%i! %CYAN%-^>%NC% !PREFIX!_!PADDED!!EXT_%%i!
     )
     echo.
-    echo   %BOLD%총 %FILE_COUNT%개 파일을 정리합니다.%NC%
+    echo   %BOLD%총 !FILE_COUNT!개 파일을 정리합니다.%NC%
     echo.
     exit /b 0
 
@@ -129,14 +140,14 @@ exit /b %errorlevel%
     echo.
 
     :: 1단계: 임시 이름으로 변경 (이름 충돌 방지)
-    for /l %%i in (1,1,%FILE_COUNT%) do (
+    for /l %%i in (1,1,!FILE_COUNT!) do (
         ren "%SCRIPT_DIR%!FILE_%%i!" "%TMP_PREFIX%%%i!EXT_%%i!" 2>nul
     )
 
     :: 2단계: 최종 이름으로 변경 및 복원 스크립트 작성
     set "RENAME_SUCCESS=0"
     set "RENAME_FAIL=0"
-    for /l %%i in (1,1,%FILE_COUNT%) do (
+    for /l %%i in (1,1,!FILE_COUNT!) do (
         set "ZEROS=000000000%%i"
         set "PADDED=!ZEROS:~-%PAD_WIDTH%!"
         set "TEMP_NAME=%TMP_PREFIX%%%i!EXT_%%i!"
@@ -166,10 +177,10 @@ exit /b %errorlevel%
 :print_done
     echo.
     echo %BOLD%----------------------------------------------------------------------%NC%
-    if %RENAME_FAIL% equ 0 (
-        echo   %GREEN%완료: %RENAME_SUCCESS%개 파일 변경 완료%NC%
+    if "!RENAME_FAIL!"=="0" (
+        echo   %GREEN%완료: !RENAME_SUCCESS!개 파일 변경 완료%NC%
     ) else (
-        echo   %YELLOW%완료: %RENAME_SUCCESS%개 성공, %RENAME_FAIL%개 실패%NC%
+        echo   %YELLOW%완료: !RENAME_SUCCESS!개 성공, !RENAME_FAIL!개 실패%NC%
     )
     echo   복원 스크립트: %CYAN%%RESTORE_FILE%%NC%
     echo %BOLD%======================================================================%NC%
