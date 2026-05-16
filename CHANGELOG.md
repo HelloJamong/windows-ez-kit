@@ -12,6 +12,7 @@ Windows-EZ-Kit 전체 프로젝트의 변경 이력입니다.
 - `scripts/sort_by_name/main.bat`: 실행 폴더 경로에 `)` 같은 괄호가 포함되면 배치 블록 파싱이 깨지는 문제 수정
 - `scripts/sort_by_name/main.bat`: PowerShell 의존성을 제거하고 복원 스크립트 이름을 랜덤 접미사 기반으로 변경
 - `scripts/sort_by_name/main.bat`: UTF-8 코드 페이지를 설정해 한글 안내문이 깨지는 문제 완화
+- `scripts/sort_by_name/main.bat`: `cmd.exe` 코드페이지/파서 문제를 피하기 위해 ASCII-only로 변경
 
 ## [0.1.0] - 2026-05-16
 
