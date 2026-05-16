@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal EnableExtensions EnableDelayedExpansion
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -21,19 +22,24 @@ set "NC="
 
 set "SCRIPT_DIR=%~dp0"
 set "SCRIPT_NAME=%~nx0"
-set "TIMESTAMP=%DATE%_%TIME%_%RANDOM%"
-set "TIMESTAMP=%TIMESTAMP:/=%"
-set "TIMESTAMP=%TIMESTAMP:-=%"
-set "TIMESTAMP=%TIMESTAMP:.=%"
-set "TIMESTAMP=%TIMESTAMP::=%"
-set "TIMESTAMP=%TIMESTAMP: =0%"
+pushd "%SCRIPT_DIR%" >nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo   오류: 대상 폴더로 이동할 수 없습니다.
+    echo   대상 경로: !SCRIPT_DIR!
+    echo.
+    pause
+    exit /b 1
+)
+set "TIMESTAMP=%RANDOM%_%RANDOM%_%RANDOM%"
 
-set "BACKUP_DIR=%SCRIPT_DIR%_sort_backup"
+set "BACKUP_DIR=_sort_backup"
 set "RESTORE_FILE=%BACKUP_DIR%\restore_%TIMESTAMP%.bat"
 set "TMP_PREFIX=__sbn_%TIMESTAMP%_"
 
 call :main
 set "EXIT_CODE=%errorlevel%"
+popd >nul 2>&1
 exit /b %EXIT_CODE%
 
 :: ==============================================================================
@@ -76,7 +82,7 @@ exit /b %EXIT_CODE%
     echo   배치 파일이 위치한 폴더의 파일을 이름순으로 정렬하여
     echo   접두사_001 형식으로 일괄 변경합니다.
     echo.
-    echo   대상 경로: %CYAN%%SCRIPT_DIR%%NC%
+    echo   대상 경로: %CYAN%!SCRIPT_DIR!%NC%
     echo.
     exit /b 0
 
@@ -94,7 +100,7 @@ exit /b %EXIT_CODE%
 :: ==============================================================================
 :collect_files
     set "FILE_COUNT=0"
-    for /f "delims=" %%f in ('dir /b /o:n /a:-d "%SCRIPT_DIR%*" 2^>nul') do (
+    for /f "delims=" %%f in ('dir /b /o:n /a:-d 2^>nul') do (
         if /i not "%%f"=="%SCRIPT_NAME%" (
             set /a FILE_COUNT+=1
             set "FILE_!FILE_COUNT!=%%f"
@@ -133,6 +139,7 @@ exit /b %EXIT_CODE%
 
     (
         echo @echo off
+        echo pushd "%%~dp0.."
         echo echo.
         echo echo 원본 파일명으로 복원합니다...
         echo echo.
@@ -144,7 +151,7 @@ exit /b %EXIT_CODE%
 
     :: 1단계: 임시 이름으로 변경 (이름 충돌 방지)
     for /l %%i in (1,1,!FILE_COUNT!) do (
-        ren "%SCRIPT_DIR%!FILE_%%i!" "%TMP_PREFIX%%%i!EXT_%%i!" 2>nul
+        ren "!FILE_%%i!" "!TMP_PREFIX!%%i!EXT_%%i!" 2>nul
     )
 
     :: 2단계: 최종 이름으로 변경 및 복원 스크립트 작성
@@ -153,14 +160,14 @@ exit /b %EXIT_CODE%
     for /l %%i in (1,1,!FILE_COUNT!) do (
         set "ZEROS=000000000%%i"
         set "PADDED=!ZEROS:~-%PAD_WIDTH%!"
-        set "TEMP_NAME=%TMP_PREFIX%%%i!EXT_%%i!"
+        set "TEMP_NAME=!TMP_PREFIX!%%i!EXT_%%i!"
         set "NEW_NAME=!PREFIX!_!PADDED!!EXT_%%i!"
         set "ORIG=!FILE_%%i!"
 
-        ren "%SCRIPT_DIR%!TEMP_NAME!" "!NEW_NAME!" 2>nul
+        ren "!TEMP_NAME!" "!NEW_NAME!" 2>nul
         if !errorlevel! equ 0 (
             set /a RENAME_SUCCESS+=1
-            echo ren "%SCRIPT_DIR%!NEW_NAME!" "!ORIG!" >> "%RESTORE_FILE%"
+            echo ren "!NEW_NAME!" "!ORIG!" >> "%RESTORE_FILE%"
             echo   %GREEN%완료%NC%: !ORIG! %CYAN%-^>%NC% !NEW_NAME!
         ) else (
             set /a RENAME_FAIL+=1
@@ -171,6 +178,7 @@ exit /b %EXIT_CODE%
     (
         echo echo.
         echo echo 복원이 완료되었습니다.
+        echo popd
         echo pause
     ) >> "%RESTORE_FILE%"
 
@@ -185,7 +193,7 @@ exit /b %EXIT_CODE%
     ) else (
         echo   %YELLOW%완료: !RENAME_SUCCESS!개 성공, !RENAME_FAIL!개 실패%NC%
     )
-    echo   복원 스크립트: %CYAN%%RESTORE_FILE%%NC%
+    echo   복원 스크립트: %CYAN%!SCRIPT_DIR!!RESTORE_FILE!%NC%
     echo %BOLD%======================================================================%NC%
     echo.
     pause
