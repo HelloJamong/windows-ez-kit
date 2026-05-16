@@ -19,7 +19,7 @@ set "NC=%ESC%[0m"
 
 set "SCRIPT_DIR=%~dp0"
 set "SCRIPT_NAME=%~nx0"
-for /f %%t in ('powershell -NoProfile -Command "Get-Date -Format 'yyyyMMdd_HHmmss'"') do set "TIMESTAMP=%%t"
+for /f %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set "TIMESTAMP=%%t"
 set "BACKUP_DIR=%SCRIPT_DIR%_sort_backup"
 set "RESTORE_FILE=%BACKUP_DIR%\restore_%TIMESTAMP%.bat"
 set "TMP_PREFIX=__sbn_%TIMESTAMP%_"
