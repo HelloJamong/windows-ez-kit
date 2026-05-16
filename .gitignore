@@ -1,0 +1,24 @@
+# 백업 디렉토리
+/backup/
+
+# 임시 파일
+*.tmp
+*.log
+*.swp
+*~
+
+# OS 관련
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Windows 내보내기 결과물
+/export/
+
+# OMC (oh-my-claudecode)
+.omc/
+.omx/
+
+# PowerShell
+*.ps1xml
