@@ -1,5 +1,22 @@
 @echo off
-setlocal EnableDelayedExpansion
+
+:: Explorer에서 더블클릭 실행 시 초기 구문/환경 오류가 나도 창이 바로 닫히지 않도록
+:: 부모 cmd가 자식 실행 결과를 확인한 뒤 오류일 때만 pause 합니다.
+if /i "%~1"=="--sbn-child" goto :sbn_child
+"%ComSpec%" /D /C ""%~f0" --sbn-child"
+set "EXIT_CODE=%errorlevel%"
+if "%EXIT_CODE%"=="0" exit /b 0
+echo.
+echo   [오류] Sort by Name 실행 중 문제가 발생했습니다. 코드: %EXIT_CODE%
+echo   위 메시지를 확인한 뒤 main.bat을 최신 버전으로 다시 복사해 보세요.
+echo.
+pause
+exit /b %EXIT_CODE%
+
+:sbn_child
+shift /1
+
+setlocal EnableExtensions EnableDelayedExpansion
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Sort by Name - 파일 이름순 정리
@@ -9,8 +26,10 @@ setlocal EnableDelayedExpansion
 ::        "접두사_001" 형식으로 일괄 변경
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:: ESC 문자 설정 (PowerShell 사용, 가장 호환성 높은 방식)
-for /f "delims=" %%a in ('powershell -NoProfile -Command "[char]0x1B"') do set "ESC=%%a"
+:: ESC 문자 설정 (PowerShell 사용)
+:: for /f의 command 구분자인 작은따옴표와 내부 PowerShell 인용부호가 충돌하지 않도록
+:: usebackq/backtick 형식으로 실행합니다.
+for /f "usebackq delims=" %%a in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "[char]27"`) do set "ESC=%%a"
 if not defined ESC set "ESC="
 
 set "RED=%ESC%[31m"
@@ -22,7 +41,7 @@ set "NC=%ESC%[0m"
 
 set "SCRIPT_DIR=%~dp0"
 set "SCRIPT_NAME=%~nx0"
-for /f "delims=" %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set "TIMESTAMP=%%t"
+for /f "usebackq delims=" %%t in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-Date -Format 'yyyyMMdd_HHmmss'"`) do set "TIMESTAMP=%%t"
 if not defined TIMESTAMP set "TIMESTAMP=00000000_000000"
 
 set "BACKUP_DIR=%SCRIPT_DIR%_sort_backup"

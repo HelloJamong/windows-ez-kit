@@ -6,6 +6,10 @@ Windows-EZ-Kit 전체 프로젝트의 변경 이력입니다.
 
 ## [Unreleased]
 
+### Fixed
+- `scripts/sort_by_name/main.bat`: 더블클릭 실행 중 초기 오류가 발생해도 창이 즉시 닫히지 않도록 실행 래퍼 추가
+- `scripts/sort_by_name/main.bat`: PowerShell 기반 `for /f` 호출을 `usebackq` 형식으로 변경해 인용부호 충돌 가능성 완화
+
 ## [0.1.0] - 2026-05-16
 
 ### Added
