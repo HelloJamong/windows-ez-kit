@@ -17,6 +17,15 @@ Windows Ez Kit은 Windows 서버/PC 관리자와 운영자를 위한 편리한 �
 - **사용 사례**: 사진/영상 파일 일괄 정리, 문서 파일 순번 부여, 날짜 기준 촬영본 정렬
 - **지원 환경**: Windows 10 / 11, Windows Server 2019 / 2022
 
+### 시스템 / 디스크
+
+#### [Disk Tree](scripts/disk_tree/)
+지정한 폴더의 하위 구조를 트리 형태로 시각화하고, 각 파일과 폴더의 크기를 표시하는 분석 도구입니다.
+
+- **주요 기능**: 폴더 트리 구조 시각화, 파일·폴더 크기 표시 (B/KB/MB/GB 자동 단위), 폴더 합산 크기, 최대 깊이 지정, TXT 보고서 저장
+- **사용 사례**: 디스크 점유 원인 파악, 대용량 파일·폴더 탐색, 폴더 구조 문서화
+- **지원 환경**: Windows 10 / 11, Windows Server 2019 / 2022 (PowerShell 5.1 이상)
+
 ## 다운로드
 
 ### 스크립트별 개별 다운로드
@@ -26,6 +35,7 @@ Git 없이 원하는 스크립트만 ZIP 파일로 바로 다운로드할 수 �
 | 스크립트 | 다운로드 |
 |---------|---------|
 | Sort by Name | [ZIP 다운로드](https://download-directory.github.io/?url=https://github.com/HelloJamong/windows-ez-kit/tree/main/scripts/sort_by_name) |
+| Disk Tree | [ZIP 다운로드](https://download-directory.github.io/?url=https://github.com/HelloJamong/windows-ez-kit/tree/main/scripts/disk_tree) |
 
 > **참고**: 다운로드 링크는 [download-directory.github.io](https://download-directory.github.io) 서비스를 이용합니다.
 > 브라우저에서 링크를 클릭하면 ZIP 파일이 자동으로 다운로드됩니다.
@@ -56,8 +66,11 @@ windows-ez-kit/
 ├── README.md                           # 이 파일
 ├── export.bat                          # 스크립트 개별 ZIP 내보내기
 ├── scripts/                            # 모든 스크립트
-│   └── sort_by_name/                   # 파일 이름순 정리
-│       ├── main.bat
+│   ├── sort_by_name/                   # 파일 이름순 정리
+│   │   ├── main.bat
+│   │   └── README.md
+│   └── disk_tree/                      # 폴더 트리 분석
+│       ├── main.ps1
 │       └── README.md
 ```
 
