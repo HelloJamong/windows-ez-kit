@@ -6,6 +6,9 @@ Windows-EZ-Kit 전체 프로젝트의 변경 이력입니다.
 
 ## [Unreleased]
 
+### Added
+- `scripts/netstat_status_monitor`: 지정 포트의 `netstat -an` 결과를 1초 단위로 기록하고 `ESTABLISHED` 상태 이탈을 표시하는 PowerShell 스크립트 추가
+
 ### Fixed
 - `scripts/sort_by_name/main.bat`: 즉시 종료 원인이 될 수 있는 초기 PowerShell/ANSI 색상 초기화 제거
 - `scripts/sort_by_name/README.md`: 관리자 권한 필요 여부 안내 추가

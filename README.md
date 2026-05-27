@@ -26,6 +26,15 @@ Windows Ez Kit은 Windows 서버/PC 관리자와 운영자를 위한 편리한 �
 - **사용 사례**: 디스크 점유 원인 파악, 대용량 파일·폴더 탐색, 폴더 구조 문서화
 - **지원 환경**: Windows 10 / 11, Windows Server 2019 / 2022 (PowerShell 5.1 이상)
 
+### 네트워크
+
+#### [Netstat Status Monitor](scripts/netstat_status_monitor/)
+지정한 포트의 `netstat -an` 결과를 1초 단위로 확인하고, `ESTABLISHED` 상태가 사라지는 시점을 로그로 남기는 모니터링 도구입니다.
+
+- **주요 기능**: 포트 번호 입력, 1초 단위 netstat 상태 기록, NOT_ESTABLISHED 표시, `C:\Temp` 로그 저장, 실행 중 자동 절전 방지
+- **사용 사례**: 서버 연결 끊김 시점 확인, 특정 포트 세션 상태 추적, 간헐적 네트워크 장애 증거 수집
+- **지원 환경**: Windows 10 / 11, Windows Server 2019 / 2022 (PowerShell 5.1 이상)
+
 ## 다운로드
 
 ### 스크립트별 개별 다운로드
@@ -36,6 +45,7 @@ Git 없이 원하는 스크립트만 ZIP 파일로 바로 다운로드할 수 �
 |---------|---------|
 | Sort by Name | [ZIP 다운로드](https://download-directory.github.io/?url=https://github.com/HelloJamong/windows-ez-kit/tree/main/scripts/sort_by_name) |
 | Disk Tree | [ZIP 다운로드](https://download-directory.github.io/?url=https://github.com/HelloJamong/windows-ez-kit/tree/main/scripts/disk_tree) |
+| Netstat Status Monitor | [ZIP 다운로드](https://download-directory.github.io/?url=https://github.com/HelloJamong/windows-ez-kit/tree/main/scripts/netstat_status_monitor) |
 
 > **참고**: 다운로드 링크는 [download-directory.github.io](https://download-directory.github.io) 서비스를 이용합니다.
 > 브라우저에서 링크를 클릭하면 ZIP 파일이 자동으로 다운로드됩니다.
@@ -69,7 +79,10 @@ windows-ez-kit/
 │   ├── sort_by_name/                   # 파일 이름순 정리
 │   │   ├── main.bat
 │   │   └── README.md
-│   └── disk_tree/                      # 폴더 트리 분석
+│   ├── disk_tree/                      # 폴더 트리 분석
+│   │   ├── main.ps1
+│   │   └── README.md
+│   └── netstat_status_monitor/         # 포트 연결 상태 로그 기록
 │       ├── main.ps1
 │       └── README.md
 ```

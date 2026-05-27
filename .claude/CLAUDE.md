@@ -31,7 +31,10 @@ windows-ez-kit/
     ├── sort_by_name/                 # 파일 이름순 정리
     │   ├── main.bat
     │   └── README.md
-    └── disk_tree/                    # 폴더 트리 분석
+    ├── disk_tree/                    # 폴더 트리 분석
+    │   ├── main.ps1
+    │   └── README.md
+    └── netstat_status_monitor/       # 포트 연결 상태 로그 기록
         ├── main.ps1
         └── README.md
 ```
@@ -109,6 +112,51 @@ disk_tree/
 - 폴더 크기 캐시로 중복 탐색 방지 (`$script:SizeCache` 해시테이블)
 - `Strip-Ansi` 함수로 콘솔(컬러)·파일(순수 텍스트) 동시 출력
 - `_disk_tree_report` 폴더는 크기 집계 및 트리 렌더링에서 자동 제외
+
+#### 사용 방법
+
+```powershell
+:: PowerShell 콘솔에서 실행
+.\main.ps1
+
+:: 실행 정책 문제 시
+powershell -ExecutionPolicy Bypass -File ".\main.ps1"
+```
+
+#### 지원 환경
+
+- Windows 10 / 11
+- Windows Server 2019 / 2022
+- PowerShell 5.1 이상
+
+---
+
+### 3. Netstat Status Monitor (`netstat_status_monitor/`)
+
+**목적**: 지정 포트의 `netstat -an` 결과를 1초 단위로 기록하고, `ESTABLISHED` 상태가 사라지는 시점을 로그로 표시
+
+#### 파일 구조
+
+```
+netstat_status_monitor/
+├── main.ps1          # 단일 스크립트 (입력/모니터링/로그 저장/절전 방지 포함)
+└── README.md         # 사용 가이드
+```
+
+#### 주요 기능
+
+- 실행 시 스캔할 포트 번호 입력
+- 1초마다 `netstat -an | findstr "포트"` 형태로 연결 상태 확인
+- `ESTABLISHED` 행이 없으면 `[NOT_ESTABLISHED]` 로그 표시
+- `C:\Temp\yyyyMMdd_HHmmss_<port>_status.txt` 형식으로 로그 저장
+- 실행 중 Windows 자동 절전 진입 방지 (`SetThreadExecutionState`)
+
+#### 기술적 특징
+
+- 단일 PowerShell 스크립트 (PS1) — BAT 진입점 없음
+- PowerShell 5.1 호환
+- 로그 상단에 최초 실행 날짜/시간 기록
+- 각 로그 행은 `HH:mm:ss - netstat 결과` 형식으로 저장
 
 #### 사용 방법
 
